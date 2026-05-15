@@ -1,282 +1,859 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Olivia’s Cozy Corner</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Cozy Café Corner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg-overlay: rgba(20, 10, 5, 0.55);
+      --accent: #f4b27a;
+      --accent-soft: #f8d4a8;
+      --text-main: #fdf5e9;
+      --text-muted: #e3d2c0;
+      --card-bg: rgba(35, 22, 18, 0.9);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --leaf-color: rgba(255, 186, 120, 0.8);
+      --cat-cream: #ffe6c9;
+      --cat-outline: #5b3a2a;
+      --cat-blush: #f7a6a6;
+      --link: #ffd59b;
+      --link-hover: #ffe9c7;
+    }
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;600&family=Nunito:wght@300;400;700&display=swap" rel="stylesheet">
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      color: var(--text-main);
+      background: #1a0f0a;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-<style>
-/* 🌿 Base styling */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Quicksand', sans-serif;
-  color: #3e2f1c;
-  background: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD...') no-repeat center center fixed;
-  background-size: cover;
-  overflow-x: hidden;
-  transition: background-color 1s ease;
-}
+    /* Background image */
+    .background {
+      position: fixed;
+      inset: 0;
+      background-image: url("https://img.magnific.com/premium-photo/serene-sunset-scene-featuring-sleeping-cat-balcony-surrounded-by-plants-books_1383414-2910.jpg?semt=ais_hybrid&w=740&q=80");
+      background-size: cover;
+      background-position: center;
+      filter: blur(2px) brightness(0.7);
+      transform: scale(1.02);
+      z-index: -2;
+    }
 
-/* Warm café glow toggle */
-body.glow {
-  background-color: rgba(255, 214, 165, 0.25);
-  backdrop-filter: blur(3px);
-}
+    .background-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(255, 210, 150, 0.35), transparent 55%),
+                  linear-gradient(to bottom, rgba(15, 8, 5, 0.7), rgba(10, 5, 3, 0.95));
+      z-index: -1;
+    }
 
-/* Container */
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 80px;
-  text-align: center;
-  background-color: rgba(255, 248, 240, 0.6);
-  backdrop-filter: blur(4px);
-  margin: 40px auto;
-  width: 80%;
-  border-radius: 20px;
-  padding-bottom: 40px;
-  animation: fadeIn 1.5s ease-in-out;
-}
+    /* Night mode toggle */
+    body.night-mode .background {
+      filter: blur(2px) brightness(0.4);
+    }
+    body.night-mode .background-overlay {
+      background: radial-gradient(circle at top, rgba(120, 160, 255, 0.25), transparent 55%),
+                  linear-gradient(to bottom, rgba(5, 8, 20, 0.9), rgba(3, 5, 12, 0.98));
+    }
 
-/* Title */
-h1 {
-  font-family: 'Nunito', sans-serif;
-  font-size: 2.8em;
-  margin-bottom: 0.3em;
-  color: #5a3e2b;
-}
+    /* Sparkles for magic mode */
+    .sparkles {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    body.night-mode .sparkles {
+      opacity: 1;
+    }
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+      animation: sparkleFloat 6s linear infinite;
+    }
+    @keyframes sparkleFloat {
+      0% {
+        transform: translateY(100vh) scale(0.4);
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+      }
+    }
 
-/* Buttons */
-a.button {
-  display: inline-block;
-  margin: 0.4em;
-  padding: 0.6em 1.2em;
-  background-color: #d8a47f;
-  color: #fff;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
-}
+    /* Falling leaves */
+    .leaves {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .leaf {
+      position: absolute;
+      width: 10px;
+      height: 16px;
+      border-radius: 50% 50% 50% 50%;
+      background: var(--leaf-color);
+      opacity: 0.7;
+      transform-origin: center;
+      animation: leafFall linear infinite;
+    }
+    .leaf::before {
+      content: "";
+      position: absolute;
+      inset: 2px 3px;
+      border-radius: inherit;
+      border-left: 1px solid rgba(120, 70, 40, 0.6);
+    }
+    @keyframes leafFall {
+      0% {
+        transform: translateY(-10vh) translateX(0) rotate(0deg);
+      }
+      100% {
+        transform: translateY(110vh) translateX(40px) rotate(120deg);
+      }
+    }
 
-a.button:hover {
-  background-color: #b97a57;
-}
+    /* Layout */
+    .content {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
-/* Magic button */
-#magicButton {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background: #8b5e3c;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.3s;
-}
+    .top-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: stretch;
+    }
 
-#magicButton:hover {
-  background: #6d452a;
-}
+    .card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+      padding: 18px 20px;
+      backdrop-filter: blur(10px);
+    }
 
-/* Checklist */
-.checklist {
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 1em 1.5em;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(90, 60, 40, 0.2);
-  text-align: left;
-  display: inline-block;
-  margin-top: 20px;
-}
+    .header-card {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-.checklist h2 {
-  font-family: 'Nunito', sans-serif;
-  color: #5a3e2b;
-  margin-bottom: 0.6em;
-}
+    .header-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-.checklist label {
-  display: block;
-  margin: 0.4em 0;
-  cursor: pointer;
-}
+    .header-sub {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
 
-/* Quotes */
-.quote-box {
-  margin-top: 25px;
-  font-style: italic;
-  font-size: 1.2em;
-  color: #4a3728;
-}
+    .magic-button {
+      margin-top: 8px;
+      align-self: flex-start;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: linear-gradient(135deg, #f7c08a, #f39b7a);
+      color: #3b1f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    }
+    .magic-button:hover {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+      filter: brightness(1.05);
+    }
+    .magic-button:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
 
-/* Falling leaves */
-@keyframes fall {
-  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(110vh) rotate(360deg); opacity: 0.8; }
-}
+    .calendar-card {
+      flex: 1.1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+    }
 
-.leaf {
-  position: fixed;
-  top: -10vh;
-  width: 25px;
-  height: 25px;
-  background: radial-gradient(#f4a460, #8b4513);
-  border-radius: 50%;
-  opacity: 0.9;
-  animation: fall 10s linear infinite;
-}
+    .calendar-header {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent-soft);
+    }
 
-.leaf:nth-child(1) { left: 10%; animation-delay: 0s; }
-.leaf:nth-child(2) { left: 25%; animation-delay: 2s; }
-.leaf:nth-child(3) { left: 40%; animation-delay: 4s; }
-.leaf:nth-child(4) { left: 60%; animation-delay: 1s; }
-.leaf:nth-child(5) { left: 75%; animation-delay: 3s; }
-.leaf:nth-child(6) { left: 90%; animation-delay: 5s; }
+    .calendar-date {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
 
-/* Subtle background animation */
-@keyframes glowShift {
-  0% { filter: brightness(1) saturate(1); }
-  50% { filter: brightness(1.05) saturate(1.1); }
-  100% { filter: brightness(1) saturate(1); }
-}
+    .calendar-time {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--accent);
+    }
 
-body {
-  animation: glowShift 20s ease-in-out infinite;
-}
+    .calendar-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
 
-/* Cats */
-.cat {
-  position: fixed;
-  width: 80px;
-  height: 80px;
-  background-image: url('https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg');
-  background-size: cover;
-  background-position: center;
-  transition: transform 0.3s ease;
-  z-index: 10;
-  animation: breathing 3s ease-in-out infinite;
-}
+    /* Quote card */
+    .quote-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
-.cat-left { bottom: 10px; left: 10px; }
-.cat-right { bottom: 10px; right: 10px; }
+    .quote-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent-soft);
+    }
 
-.cat:hover {
-  transform: scale(1.2) rotate(10deg);
-}
+    .quote-text {
+      font-size: 1.05rem;
+      line-height: 1.5;
+      font-style: italic;
+    }
 
-/* Breathing animation */
-@keyframes breathing {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
+    .quote-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
 
-/* Fade-in */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-</style>
+    /* Links card */
+    .links-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .links-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent-soft);
+    }
+
+    .links-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .link-pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(30, 18, 12, 0.9);
+      font-size: 0.85rem;
+      text-decoration: none;
+      color: var(--link);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    }
+    .link-pill:hover {
+      background: rgba(50, 30, 20, 0.95);
+      color: var(--link-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Main cozy area */
+    .main-row {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 900px) {
+      .main-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .notebook-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .notebook-inner {
+      position: relative;
+      padding: 14px 16px 16px;
+      border-radius: 14px;
+      background: radial-gradient(circle at top left, rgba(255, 230, 200, 0.12), transparent 55%);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+    }
+
+    .notebook-title {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent-soft);
+      margin-bottom: 6px;
+    }
+
+    .notebook-list {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    .notebook-list li {
+      margin-bottom: 4px;
+    }
+
+    .notebook-cat-light {
+      position: absolute;
+      right: 12px;
+      bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--accent-soft);
+    }
+
+    .cat-nightlight {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #fffaf3, #ffe0b8);
+      box-shadow: 0 0 12px rgba(255, 230, 190, 0.9);
+      position: relative;
+    }
+    .cat-nightlight::before,
+    .cat-nightlight::after {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 10px;
+      border-radius: 50% 50% 0 0;
+      background: #fffaf3;
+      top: -4px;
+    }
+    .cat-nightlight::before {
+      left: 4px;
+    }
+    .cat-nightlight::after {
+      right: 4px;
+    }
+
+    /* Side cozy info */
+    .side-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .side-section-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent-soft);
+    }
+
+    .side-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Corner anime cats */
+    .corner-cat {
+      position: fixed;
+      width: 80px;
+      height: 80px;
+      z-index: 5;
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    .corner-cat:hover {
+      transform: translateY(-4px) scale(1.03);
+      filter: brightness(1.05);
+    }
+    .corner-cat:active {
+      transform: translateY(0) scale(0.97);
+    }
+
+    .corner-cat-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .cat-body {
+      position: absolute;
+      bottom: 0;
+      left: 8px;
+      right: 8px;
+      height: 40px;
+      background: var(--cat-cream);
+      border-radius: 40px 40px 20px 20px;
+      border: 2px solid var(--cat-outline);
+      box-sizing: border-box;
+    }
+
+    .cat-head {
+      position: absolute;
+      bottom: 30px;
+      left: 14px;
+      right: 14px;
+      height: 34px;
+      background: var(--cat-cream);
+      border-radius: 50%;
+      border: 2px solid var(--cat-outline);
+      box-sizing: border-box;
+    }
+
+    .cat-ear {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: var(--cat-cream);
+      border: 2px solid var(--cat-outline);
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+      top: -8px;
+    }
+    .cat-ear.left {
+      left: 6px;
+      transform: rotate(-8deg);
+    }
+    .cat-ear.right {
+      right: 6px;
+      transform: rotate(8deg);
+    }
+
+    .cat-eye {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--cat-outline);
+      top: 14px;
+    }
+    .cat-eye.left {
+      left: 11px;
+    }
+    .cat-eye.right {
+      right: 11px;
+    }
+
+    .cat-mouth {
+      position: absolute;
+      width: 12px;
+      height: 8px;
+      border-radius: 0 0 12px 12px;
+      border-bottom: 2px solid var(--cat-outline);
+      border-left: 2px solid transparent;
+      border-right: 2px solid transparent;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .cat-blush {
+      position: absolute;
+      width: 6px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--cat-blush);
+      opacity: 0.7;
+      top: 19px;
+    }
+    .cat-blush.left {
+      left: 4px;
+    }
+    .cat-blush.right {
+      right: 4px;
+    }
+
+    .cat-tail {
+      position: absolute;
+      width: 26px;
+      height: 10px;
+      border-radius: 10px;
+      border: 2px solid var(--cat-outline);
+      border-left: none;
+      background: var(--cat-cream);
+      right: -10px;
+      bottom: 16px;
+      transform-origin: left center;
+      animation: tailWiggle 2.4s ease-in-out infinite;
+    }
+
+    @keyframes tailWiggle {
+      0%, 100% {
+        transform: rotate(8deg);
+      }
+      50% {
+        transform: rotate(-10deg);
+      }
+    }
+
+    .corner-cat.blinking .cat-eye {
+      animation: blink 4s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 92%, 100% {
+        transform: scaleY(1);
+      }
+      94%, 96% {
+        transform: scaleY(0.1);
+      }
+    }
+
+    .corner-cat-tooltip {
+      position: absolute;
+      bottom: 82px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(25, 15, 10, 0.95);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.7rem;
+      white-space: nowrap;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .corner-cat:hover .corner-cat-tooltip {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-2px);
+    }
+
+    .corner-cat.bottom-left {
+      left: 10px;
+      bottom: 10px;
+    }
+    .corner-cat.bottom-right {
+      right: 10px;
+      bottom: 10px;
+    }
+
+    /* Toast bubble for cat interactions */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 80px;
+      transform: translateX(-50%);
+      background: rgba(25, 15, 10, 0.96);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 10;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+  </style>
 </head>
-
 <body>
+  <div class="background"></div>
+  <div class="background-overlay"></div>
+  <div class="leaves" id="leaves"></div>
+  <div class="sparkles" id="sparkles"></div>
 
-<!-- Falling leaves -->
-<div class="leaf"></div>
-<div class="leaf"></div>
-<div class="leaf"></div>
-<div class="leaf"></div>
-<div class="leaf"></div>
-<div class="leaf"></div>
-
-<!-- Cats -->
-<div class="cat cat-left"></div>
-<div class="cat cat-right"></div>
-
-<div class="container">
-  <h1>Welcome to Olivia’s Cozy Corner ☕</h1>
-  <p>Take a breath, sip your coffee, and enjoy the calm.</p>
-
-  <!-- Links -->
-  <a href="https://music.youtube.com" target="_blank" class="button">YouTube Music</a>
-  <a href="https://www.google.com" target="_blank" class="button">Google</a>
-  <a href="https://mail.google.com" target="_blank" class="button">Gmail</a>
-  <a href="https://www.youtube.com" target="_blank" class="button">YouTube</a>
-
-  <!-- Magic Button -->
-  <button id="magicButton">Magic Café Glow ✨</button>
-
-  <!-- Checklist -->
-  <div class="checklist">
-    <h2>Daily Café Checklist</h2>
-    <label><input type="checkbox" id="task1"> Brew a fresh cup ☕</label>
-    <label><input type="checkbox" id="task2"> Water the ivy 🌿</label>
-    <label><input type="checkbox" id="task3"> Play soft jazz 🎶</label>
-    <label><input type="checkbox" id="task4"> Feed the cats 🐈</label>
+  <!-- Corner anime cats -->
+  <div class="corner-cat bottom-left blinking" data-cat="left">
+    <div class="corner-cat-inner">
+      <div class="cat-body"></div>
+      <div class="cat-head">
+        <div class="cat-ear left"></div>
+        <div class="cat-ear right"></div>
+        <div class="cat-eye left"></div>
+        <div class="cat-eye right"></div>
+        <div class="cat-mouth"></div>
+        <div class="cat-blush left"></div>
+        <div class="cat-blush right"></div>
+      </div>
+      <div class="cat-tail"></div>
+    </div>
+    <div class="corner-cat-tooltip">Click me for a cozy tip ✨</div>
   </div>
 
-  <!-- Quote -->
-  <div class="quote-box" id="quoteBox">
-    “A cozy day begins with a warm heart.”
+  <div class="corner-cat bottom-right blinking" data-cat="right">
+    <div class="corner-cat-inner">
+      <div class="cat-body"></div>
+      <div class="cat-head">
+        <div class="cat-ear left"></div>
+        <div class="cat-ear right"></div>
+        <div class="cat-eye left"></div>
+        <div class="cat-eye right"></div>
+        <div class="cat-mouth"></div>
+        <div class="cat-blush left"></div>
+        <div class="cat-blush right"></div>
+      </div>
+      <div class="cat-tail"></div>
+    </div>
+    <div class="corner-cat-tooltip">Pet me for encouragement 🐾</div>
   </div>
-</div>
 
-<script>
-/* Checklist save */
-document.querySelectorAll('input[type="checkbox"]').forEach(box => {
-  const id = box.id;
-  box.checked = localStorage.getItem(id) === 'true';
-  box.addEventListener('change', () => {
-    localStorage.setItem(id, box.checked);
-  });
-});
+  <div class="toast" id="toast"></div>
 
-/* Cat sounds */
-const meow = new Audio("https://www.fesliyanstudios.com/play-mp3/4381");
-const purr = new Audio("https://www.fesliyanstudios.com/play-mp3/4382");
-purr.loop = true;
+  <main class="content">
+    <section class="top-row">
+      <div class="card header-card">
+        <div class="header-title">
+          Cozy Café Corner
+          <span style="font-size:1.2rem;">☕🐈</span>
+        </div>
+        <div class="header-sub">
+          A warm little digital nook where your to‑dos, quotes, and cats all quietly cheer you on.
+        </div>
+        <button class="magic-button" id="magicButton">
+          ✨ Magic Mood Button
+        </button>
+      </div>
 
-document.querySelectorAll('.cat').forEach(cat => {
-  cat.addEventListener('click', () => {
-    meow.currentTime = 0;
-    meow.play();
-  });
+      <div class="card calendar-card">
+        <div class="calendar-header">Today</div>
+        <div class="calendar-date" id="calendarDate">Loading...</div>
+        <div class="calendar-time" id="calendarTime">--:--</div>
+        <div class="calendar-note">
+          Time is based on your device, so this café always follows your day.
+        </div>
+      </div>
+    </section>
 
-  cat.addEventListener('mouseenter', () => {
-    purr.currentTime = 0;
-    purr.play();
-  });
+    <section class="card quote-card">
+      <div class="quote-label">Daily cozy quote</div>
+      <div class="quote-text" id="quoteText">
+        Loading a little encouragement...
+      </div>
+      <div class="quote-meta" id="quoteMeta"></div>
+    </section>
 
-  cat.addEventListener('mouseleave', () => {
-    purr.pause();
-  });
-});
+    <section class="main-row">
+      <div class="card notebook-card">
+        <div class="notebook-inner">
+          <div class="notebook-title">Gentle little checklist</div>
+          <ul class="notebook-list">
+            <li>☕ Take a slow sip of something warm.</li>
+            <li>🌿 Stretch your shoulders and unclench your jaw.</li>
+            <li>📖 Do one tiny thing for Future You.</li>
+            <li>💌 Send a kind message (to yourself counts).</li>
+          </ul>
+          <div class="notebook-cat-light">
+            <div class="cat-nightlight"></div>
+            <span>Soft glow mode: always on.</span>
+          </div>
+        </div>
+      </div>
 
-/* Magic café glow */
-document.getElementById("magicButton").addEventListener("click", () => {
-  document.body.classList.toggle("glow");
-});
+      <div class="card side-card">
+        <div>
+          <div class="side-section-title">Café links</div>
+          <div class="links-grid">
+            <a class="link-pill" href="https://www.youtube.com" target="_blank" rel="noopener">
+              🎧 Lo‑fi café
+            </a>
+            <a class="link-pill" href="https://www.trello.com" target="_blank" rel="noopener">
+              ✅ Task board
+            </a>
+            <a class="link-pill" href="https://www.notion.so" target="_blank" rel="noopener">
+              📓 Notes space
+            </a>
+            <a class="link-pill" href="https://www.pinterest.com" target="_blank" rel="noopener">
+              🌙 Cozy inspo
+            </a>
+          </div>
+        </div>
 
-/* Random cozy quotes */
-const quotes = [
-  "“A cozy day begins with a warm heart.”",
-  "“Happiness is a cup of coffee and a good book.”",
-  "“Let the cats nap and the leaves fall.”",
-  "“Peace is brewed slowly, like coffee.”"
-];
+        <div>
+          <div class="side-section-title">Tiny reminder</div>
+          <div class="side-text">
+            You don’t have to do everything today. You just have to keep gently moving in the direction that feels like home.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-setInterval(() => {
-  const box = document.getElementById("quoteBox");
-  box.textContent = quotes[Math.floor(Math.random() * quotes.length)];
-}, 10000);
-</script>
+  <script>
+    // --- Falling leaves ---
+    (function createLeaves() {
+      const container = document.getElementById("leaves");
+      const leafCount = 18;
+      for (let i = 0; i < leafCount; i++) {
+        const leaf = document.createElement("div");
+        leaf.className = "leaf";
+        const delay = Math.random() * 10;
+        const duration = 10 + Math.random() * 10;
+        const left = Math.random() * 100;
+        const drift = (Math.random() - 0.5) * 40;
+        leaf.style.left = left + "%";
+        leaf.style.animationDuration = duration + "s";
+        leaf.style.animationDelay = delay + "s";
+        leaf.style.transform = `translateX(${drift}px)`;
+        container.appendChild(leaf);
+      }
+    })();
 
+    // --- Sparkles for night mode ---
+    (function createSparkles() {
+      const container = document.getElementById("sparkles");
+      const sparkleCount = 30;
+      for (let i = 0; i < sparkleCount; i++) {
+        const s = document.createElement("div");
+        s.className = "sparkle";
+        s.style.left = Math.random() * 100 + "%";
+        s.style.animationDelay = Math.random() * 6 + "s";
+        s.style.animationDuration = 5 + Math.random() * 6 + "s";
+        container.appendChild(s);
+      }
+    })();
+
+    // --- Calendar & time ---
+    function updateDateTime() {
+      const now = new Date();
+      const dateEl = document.getElementById("calendarDate");
+      const timeEl = document.getElementById("calendarTime");
+
+      const dateOptions = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+      dateEl.textContent = now.toLocaleDateString(undefined, dateOptions);
+
+      const timeOptions = { hour: "2-digit", minute: "2-digit" };
+      timeEl.textContent = now.toLocaleTimeString(undefined, timeOptions);
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    // --- Daily quotes ---
+    const quotes = [
+      {
+        text: "You are allowed to be both a masterpiece and a work in progress at the same time.",
+        note: "Today is a good day to be gentle with yourself."
+      },
+      {
+        text: "Small steps still move you forward. Tiny is not the same as nothing.",
+        note: "Pick one tiny thing. That’s enough."
+      },
+      {
+        text: "Rest is not a reward. It’s a requirement.",
+        note: "Your worth is not measured by your productivity."
+      },
+      {
+        text: "You have survived 100% of your hardest days so far.",
+        note: "Evidence suggests you’re quietly very strong."
+      },
+      {
+        text: "There is no behind. You are arriving exactly when you’re meant to.",
+        note: "Your timeline is allowed to be your own."
+      },
+      {
+        text: "Soft hearts are not weak. They’re just brave in a quieter way.",
+        note: "You can be kind and still have boundaries."
+      },
+      {
+        text: "Even slow growth is growth. Roots are invisible but essential.",
+        note: "Something good is still forming under the surface."
+      }
+    ];
+
+    function setDailyQuote() {
+      const today = new Date();
+      const index = today.getDay() % quotes.length;
+      const quote = quotes[index];
+      document.getElementById("quoteText").textContent = "“" + quote.text + "”";
+      document.getElementById("quoteMeta").textContent = quote.note;
+    }
+    setDailyQuote();
+
+    // --- Magic button: toggle night mode ---
+    const magicButton = document.getElementById("magicButton");
+    magicButton.addEventListener("click", () => {
+      document.body.classList.toggle("night-mode");
+      showToast(
+        document.body.classList.contains("night-mode")
+          ? "Night mode on: extra cozy activated. 🌙"
+          : "Back to golden hour. ☀️"
+      );
+    });
+
+    // --- Corner cats interactions ---
+    const catMessagesLeft = [
+      "You’re doing better than you think. 🐾",
+      "Tiny breaks are still progress. ✨",
+      "Future You is already proud of you.",
+      "Hydration check! Maybe a sip of water? 💧"
+    ];
+    const catMessagesRight = [
+      "You’re allowed to take up space. 💛",
+      "One gentle step at a time.",
+      "Your pace is valid. Always.",
+      "You’re not behind. You’re on your path."
+    ];
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast._timeout);
+      showToast._timeout = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2600);
+    }
+
+    document.querySelectorAll(".corner-cat").forEach((cat) => {
+      cat.addEventListener("click", () => {
+        const side = cat.dataset.cat;
+        const pool = side === "left" ? catMessagesLeft : catMessagesRight;
+        const msg = pool[Math.floor(Math.random() * pool.length)];
+        showToast(msg);
+      });
+    });
+  </script>
 </body>
 </html>
